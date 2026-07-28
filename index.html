@@ -456,7 +456,7 @@ visual_checklist: 텍스트로 판단 불가하여 영상을 직접 봐야 하�
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
