@@ -49,7 +49,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .frame-progress-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
 .frame-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .2s}
 .apikey-section{padding:1rem 1.25rem;border-top:1px solid var(--border);background:var(--surface-2)}
-.apikey-row{display:flex;gap:6px;align-items:center}
+
 .apikey-row input{flex:1;font-family:'JetBrains Mono',monospace;font-size:11px}
 .eye-btn{padding:7px 8px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;color:var(--text-secondary);display:flex;align-items:center}
 .eye-btn:hover{background:var(--surface-2)}
@@ -178,14 +178,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
         <textarea id="trans" placeholder="영상 대본 또는 자막 (타임스탬프 포함 권장)" rows="4"></textarea>
         <div class="hint">타임스탬프 포함 시 더 정확한 검수가 가능합니다</div>
       </div>
-    </div>
-    <div class="apikey-section">
-      <label class="field-label">Anthropic API Key</label>
-      <div class="apikey-row">
-        <input type="password" id="apikey" placeholder="sk-ant-api03-...">
-        <button class="eye-btn" onclick="toggleKey()">👁</button>
-      </div>
-      <div class="key-hint">키는 이 탭에서만 사용되며 저장되지 않습니다</div>
     </div>
     <div class="sidebar-footer">
       <button class="run-btn" id="runbtn" onclick="runReview()">
@@ -367,10 +359,6 @@ const COMMON_MANUAL = [
 
 let extractedFrames = [];
 
-function toggleKey() {
-  const inp = document.getElementById('apikey');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
 
 function switchTab(t) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['link','file'][i] === t));
@@ -459,12 +447,10 @@ async function runReview() {
   const url     = document.getElementById('url').value.trim();
   const desc    = document.getElementById('desc').value.trim();
   const trans   = document.getElementById('trans').value.trim();
-  const apiKey  = document.getElementById('apikey').value.trim();
   const hasVideo = extractedFrames.length > 0;
 
   if (!country || !product) return alert('국가와 제품을 선택해주세요.');
   if (!url && !desc && !trans && !hasVideo) return alert('URL, 영상, Description, Transcript 중 하나 이상을 입력해주세요.');
-  if (!apiKey) return alert('API Key를 입력해주세요.');
 
   const pd = PRODUCTS[product] || { pn: product, features: [] };
 
@@ -543,14 +529,9 @@ visual_checklist: 영상으로 확인 불가하거나 프레임이 없는 visual
         ]
       : prompt;
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/review', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4000, messages: [{ role: 'user', content: messageContent }] })
     });
 
