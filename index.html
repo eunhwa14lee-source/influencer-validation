@@ -103,6 +103,25 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .progress-fill{height:100%;background:var(--pass);border-radius:2px;transition:width .3s}
 .divider{height:1px;background:var(--border);margin:1.25rem 0}
 .error-bar{padding:10px 14px;border-radius:var(--radius);background:var(--fail-bg);border:1px solid var(--fail-border);color:var(--fail);font-size:13px;margin-bottom:1rem}
+
+.action-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.action-btn{padding:8px 14px;background:var(--surface);color:var(--text);border:1px solid var(--border-strong);border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.action-btn:hover{background:var(--surface-2);border-color:var(--accent)}
+.action-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.action-btn.primary:hover{opacity:.88;background:var(--accent)}
+.action-btn.success{background:var(--pass);color:#fff;border-color:var(--pass)}
+.feedback-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(26,26,24,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
+.feedback-overlay.show{display:flex}
+.feedback-modal{background:var(--surface);border-radius:var(--radius-lg);max-width:720px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.feedback-modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.feedback-modal-header h3{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.close-btn{padding:5px 8px;background:transparent;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;border-radius:4px}
+.close-btn:hover{background:var(--surface-2);color:var(--text)}
+.feedback-modal-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1}
+.feedback-text{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:var(--text);background:var(--surface-2);padding:1rem;border-radius:var(--radius);border:1px solid var(--border);white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow-y:auto}
+.feedback-modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.copy-badge{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--pass);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:opacity .2s;pointer-events:none;z-index:1001}
+.copy-badge.show{opacity:1}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
 </style>
 </head>
@@ -536,7 +555,11 @@ ${COMMON_MANUAL.map((v,i) => `${i+1}. ${v}`).join('\n')}
   }
 }
 
+let lastResult = null;
+let lastMeta = null;
 function renderResult(d, meta) {
+  lastResult = d;
+  lastMeta = meta;
   const failCount = (d.fail_items||[]).filter(i => i.status === 'fail').length;
   const manualCount = (d.manual_items||[]).filter(i => i.status === 'found').length;
   const visualFailCount = (d.visual_items||[]).filter(i => i.status === 'fail').length;
@@ -551,7 +574,10 @@ function renderResult(d, meta) {
       ${meta.hasVideo ? '<span class="chip chip-video">🎬 영상 분석 포함</span>' : ''}
       <span class="chip chip-btn" onclick="clearResult()" style="margin-left:auto">↩ 새 검수</span>
     </div>
-    <div class="summary-bar ${oc}">${oi} ${d.summary}</div>`;
+    <div class="summary-bar ${oc}">${oi} ${d.summary}</div>
+    <div class="action-row">
+      <button class="action-btn primary" onclick="openFeedbackModal()">📝 피드백으로 전환</button>
+    </div>`;
 
   h += `<div class="result-section">
     <div class="section-head">
@@ -670,6 +696,113 @@ function clearResult() {
       <small>영상 업로드 시 장면 변화를 감지해 자동 분석합니다</small>
     </div>`;
 }
+
+// ── 피드백 전환 ──
+function parseTime(t) {
+  if (!t) return 9999;
+  const m = String(t).match(/(\d+)/);
+  return m ? parseInt(m[1]) : 9999;
+}
+
+function generateFeedback() {
+  if (!lastResult) return '';
+  const items = [];
+
+  // fail_items — 텍스트 기반이라 timestamp 없을 수 있음. 있으면 우선.
+  (lastResult.fail_items||[]).filter(i => i.status === 'fail').forEach(i => {
+    items.push({
+      time: parseTime(i.timestamp),
+      timeLabel: i.timestamp || null,
+      text: `${i.label}: ${i.detail || ''}${i.found ? ` (발견: ${i.found})` : ''}`
+    });
+  });
+
+  // visual_items — 영상 기반, timestamp 대부분 있음
+  (lastResult.visual_items||[]).filter(i => i.status === 'fail').forEach(i => {
+    items.push({
+      time: parseTime(i.timestamp),
+      timeLabel: i.timestamp || null,
+      text: `${i.label}: ${i.detail || ''}${i.found ? ` (발견: ${i.found})` : ''}`
+    });
+  });
+
+  // manual_items — (확인필요) 태그
+  (lastResult.manual_items||[]).filter(i => i.status === 'found').forEach(i => {
+    items.push({
+      time: 9998,
+      timeLabel: null,
+      text: `[확인필요] ${i.label}: ${i.detail || ''}${i.found ? ` (발견: ${i.found})` : ''}`
+    });
+  });
+
+  // visual_checklist — (확인필요) 태그
+  (lastResult.visual_checklist||[]).forEach(i => {
+    items.push({
+      time: parseTime(i.timestamp),
+      timeLabel: i.timestamp || null,
+      text: `[확인필요] ${i.label}: ${i.instruction || ''}`
+    });
+  });
+
+  // previous_feedback_items — 미반영 항목만
+  (lastResult.previous_feedback_items||[]).filter(i => i.status === 'not_resolved').forEach(i => {
+    items.push({
+      time: 9997,
+      timeLabel: null,
+      text: `[이전 피드백 미반영] ${i.feedback}${i.detail ? ` — ${i.detail}` : ''}`
+    });
+  });
+
+  // 시간순 정렬
+  items.sort((a, b) => a.time - b.time);
+
+  // 텍스트 생성
+  const lines = items.map(i => {
+    const prefix = i.timeLabel ? `* ${i.timeLabel} : ` : `* `;
+    return prefix + i.text;
+  });
+
+  return lines.length > 0 ? lines.join('\n\n') : '(피드백 항목이 없습니다)';
+}
+
+function openFeedbackModal() {
+  document.getElementById('feedback-text').textContent = generateFeedback();
+  document.getElementById('feedback-overlay').classList.add('show');
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-overlay').classList.remove('show');
+}
+
+async function copyFeedback() {
+  const text = document.getElementById('feedback-text').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    const badge = document.getElementById('copy-badge');
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 1800);
+  } catch(e) {
+    alert('복사 실패: 텍스트를 직접 선택해주세요.');
+  }
+}
 </script>
+
+<div class="feedback-overlay" id="feedback-overlay" onclick="if(event.target===this)closeFeedbackModal()">
+  <div class="feedback-modal">
+    <div class="feedback-modal-header">
+      <h3>📝 에이전시 전달용 피드백</h3>
+      <button class="close-btn" onclick="closeFeedbackModal()">✕</button>
+    </div>
+    <div class="feedback-modal-body">
+      <div class="feedback-text" id="feedback-text"></div>
+    </div>
+    <div class="feedback-modal-footer">
+      <button class="action-btn" onclick="closeFeedbackModal()">닫기</button>
+      <button class="action-btn primary" onclick="copyFeedback()">📋 복사</button>
+    </div>
+  </div>
+</div>
+<div class="copy-badge" id="copy-badge">✓ 복사되었습니다</div>
+
 </body>
 </html>
