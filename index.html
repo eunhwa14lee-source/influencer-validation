@@ -172,6 +172,11 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
         <textarea id="trans" placeholder="영상 대본 또는 자막 (타임스탬프 포함 권장)" rows="4"></textarea>
         <div class="hint">타임스탬프 포함 시 더 정확한 검수가 가능합니다</div>
       </div>
+      <div class="field-group">
+        <label class="field-label">이전 피드백 <span class="opt">(선택)</span></label>
+        <textarea id="prevfb" placeholder="이전에 전달한 피드백을 붙여넣으세요. 항목별로 줄바꿈해서 입력하면 좋아요." rows="4"></textarea>
+        <div class="hint">수정 반영 여부를 별도 섹션에서 확인합니다</div>
+      </div>
     </div>
     <div class="sidebar-footer">
       <button class="run-btn" id="runbtn" onclick="runReview()">
@@ -427,6 +432,7 @@ async function runReview() {
   const url     = document.getElementById('url').value.trim();
   const desc    = document.getElementById('desc').value.trim();
   const trans   = document.getElementById('trans').value.trim();
+  const prevfb  = document.getElementById('prevfb').value.trim();
   const hasVideo = extractedFrames.length > 0;
 
   if (!country || !product) return alert('국가와 제품을 선택해주세요.');
@@ -444,6 +450,7 @@ ${url ? '- URL: ' + url : ''}
 ${desc ? '- Description:\n' + desc : ''}
 ${trans ? '- Transcript:\n' + trans : ''}
 ${hasVideo ? `- 영상 프레임 ${extractedFrames.length}개 (장면 변화 감지 기반 추출, 타임스탬프: ${extractedFrames.map(f=>f.time+'s').join(', ')})` : ''}
+${prevfb ? '\n## 이전 피드백 (수정 반영 여부 확인 대상)\n' + prevfb : ''}
 
 ## 제품 피처
 ${pd.features.length > 0 ? pd.features.map(f => `  - ${f.n} (${f.check_type}): ${f.notes}`).join('\n') : '없음'}
@@ -469,8 +476,16 @@ ${COMMON_MANUAL.map((v,i) => `${i+1}. ${v}`).join('\n')}
   "fail_items": [{"label":"","status":"fail 또는 pass 또는 na","detail":"","found":null 또는 문자열}],
   "manual_items": [{"label":"","status":"found 또는 not_found 또는 na","detail":"","found":null 또는 문자열}],
   "visual_items": [{"label":"","status":"fail 또는 pass 또는 na","detail":"","found":null 또는 문자열,"timestamp":null 또는 문자열}],
-  "visual_checklist": [{"timestamp":"","label":"","instruction":""}]
-}`;
+  "visual_checklist": [{"timestamp":"","label":"","instruction":""}],
+  "previous_feedback_items": [{"feedback":"이전 피드백 원문","status":"resolved 또는 not_resolved 또는 uncertain","detail":"판단 근거","found":null 또는 문자열}]
+}
+
+이전 피드백이 입력된 경우, 각 피드백 항목을 개별적으로 분석하여 previous_feedback_items 배열에 담아주세요:
+- resolved: 피드백이 반영되어 수정됨
+- not_resolved: 여전히 문제가 남아있음  
+- uncertain: 영상/텍스트만으로 판단 불가
+
+이전 피드백이 없으면 previous_feedback_items는 빈 배열 []로 응답하세요.`;
 
   setLoading(true, hasVideo ? '영상 분석 중...' : '검수 중...');
   document.getElementById('main').innerHTML = `
@@ -587,6 +602,30 @@ function renderResult(d, meta) {
         <div class="ilabel">${item.label}${item.timestamp?` <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${item.timestamp})</span>`:''}</div>
         ${item.detail?`<div class="idetail ${item.status==='fail'?'fail':''}">${item.detail}</div>`:''}
         ${item.found?`<div class="ifound">발견: ${item.found}</div>`:''}
+      </div></div>`;
+    });
+    h += `</div>`;
+  }
+
+  const prevItems = d.previous_feedback_items || [];
+  if (prevItems.length > 0) {
+    const notResolved = prevItems.filter(i => i.status === 'not_resolved').length;
+    const uncertain = prevItems.filter(i => i.status === 'uncertain').length;
+    h += `<div class="divider"></div>
+    <div class="result-section">
+      <div class="section-head">
+        <span class="section-badge" style="background:#f3ecf7;color:#6b2d8f;border:1px solid #d9c1e5">🔄 이전 피드백 반영 확인</span>
+        <span class="section-count">미반영 ${notResolved}건 · 미확인 ${uncertain}건</span>
+      </div>`;
+    prevItems.forEach(item => {
+      const cls = item.status==='not_resolved'?'fail-item':item.status==='resolved'?'pass-item':'manual-item';
+      const icls = item.status==='not_resolved'?'fail':item.status==='resolved'?'pass':'warn';
+      const icon = item.status==='not_resolved'?'✕':item.status==='resolved'?'✓':'?';
+      const statusLabel = item.status==='not_resolved'?'미반영':item.status==='resolved'?'반영됨':'확인필요';
+      h += `<div class="check-item ${cls}"><div class="ico ${icls}">${icon}</div><div class="ibody">
+        <div class="ilabel">${item.feedback} <span style="font-size:10px;color:var(--text-muted);font-weight:400">— ${statusLabel}</span></div>
+        ${item.detail?`<div class="idetail ${item.status==='not_resolved'?'fail':item.status==='uncertain'?'warn':''}">${item.detail}</div>`:''}
+        ${item.found?`<div class="ifound">${item.found}</div>`:''}
       </div></div>`;
     });
     h += `</div>`;
