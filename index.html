@@ -149,6 +149,45 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .lang-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .lang-btn{padding:4px 10px;font-size:11px;background:transparent;border:none;cursor:pointer;color:var(--text-secondary);font-family:inherit}
 .lang-btn.active{background:var(--accent);color:#fff;font-weight:500}
+
+/* ── 검수 기준 편집기 ── */
+.editor-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(26,26,24,.6);display:none;align-items:flex-start;justify-content:center;z-index:500;padding:2rem 1rem;overflow-y:auto}
+.editor-overlay.show{display:flex}
+.editor-modal{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:860px;margin:auto;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.22)}
+.editor-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.editor-header h3{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.editor-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 1.5rem;flex-shrink:0;overflow-x:auto}
+.editor-tab{padding:10px 16px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-family:inherit;white-space:nowrap;transition:color .15s}
+.editor-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.editor-body{padding:1.25rem 1.5rem;overflow-y:auto;max-height:70vh}
+.editor-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.editor-footer .hint{flex:1;font-size:11px;color:var(--text-muted)}
+.epanel{display:none}.epanel.active{display:block}
+.eproduct-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:1rem}
+.eproduct-tab{padding:5px 10px;font-size:11px;background:var(--surface-2);border:0.5px solid var(--border);border-radius:20px;cursor:pointer;font-family:inherit;color:var(--text-secondary);transition:all .12s}
+.eproduct-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.eproduct-panel{display:none}.eproduct-panel.active{display:block}
+.feature-card{border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;background:var(--surface-2)}
+.feature-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.feature-name{flex:1;font-size:12px;font-weight:500}
+.feature-type-sel{font-size:11px;padding:2px 6px;border:0.5px solid var(--border);border-radius:4px;background:var(--surface);font-family:inherit;cursor:pointer}
+.feature-del{padding:2px 6px;background:transparent;border:0.5px solid var(--fail-border);border-radius:4px;color:var(--fail);font-size:11px;cursor:pointer;font-family:inherit}
+.feature-del:hover{background:var(--fail-bg)}
+.e-input{width:100%;padding:6px 8px;font-size:12px;font-family:inherit;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--surface);outline:none;resize:vertical;line-height:1.5}
+.e-input:focus{border-color:var(--accent)}
+.e-label{font-size:11px;color:var(--text-muted);margin-bottom:3px;display:block}
+.criteria-item{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px}
+.criteria-item textarea{flex:1}
+.del-btn{padding:5px 7px;background:transparent;border:0.5px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer;font-family:inherit;font-size:12px;flex-shrink:0;margin-top:1px}
+.del-btn:hover{background:var(--fail-bg);color:var(--fail);border-color:var(--fail-border)}
+.add-btn{width:100%;padding:7px;background:var(--surface-1);border:0.5px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;cursor:pointer;color:var(--text-secondary);font-family:inherit;margin-top:4px}
+.add-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.editor-toggle{position:fixed;top:1rem;right:12rem;padding:8px 14px;background:var(--surface);border:1px solid var(--border-strong);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;color:var(--text);z-index:100;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.editor-toggle:hover{background:var(--surface-2);border-color:var(--accent)}
+.save-flash{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--pass);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:500;opacity:0;transition:opacity .2s;pointer-events:none;z-index:600}
+.save-flash.show{opacity:1}
+.reset-link{font-size:11px;color:var(--fail);cursor:pointer;text-decoration:underline;margin-left:auto}
+
 .feedback-modal-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1}
 .feedback-text{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:var(--text);background:var(--surface-2);padding:1rem;border-radius:var(--radius);border:1px solid var(--border);white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow-y:auto}
 .feedback-modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
@@ -250,7 +289,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 <canvas id="hidden-canvas" style="display:none"></canvas>
 
 <script>
-const PRODUCTS = {
+const DEFAULT_PRODUCTS = {
   'Bespoke AI Refrigerator Family Hub 32"': {
     pn: 'Bespoke AI Refrigerator Family Hub',
     features: [
@@ -306,7 +345,7 @@ const PRODUCTS = {
   'Bespoke AI Slide in Range': { pn: 'Bespoke AI Slide in Range', features: [] }
 };
 
-const COMMON_FAIL = [
+const DEFAULT_COMMON_FAIL = [
   'Samsung·Bespoke 이외의 특정 브랜드 언급 (YouTube, Spotify 등)',
   '제품명·피처명 정확하지 않은 경우 (띄어쓰기, 대소문자 포함)',
   '텍스트 오버레이에서 제품명·Samsung·Bespoke 표기 오류',
@@ -317,7 +356,7 @@ const COMMON_FAIL = [
   'Description 필수 해시태그 누락 (#ad #BespokeAI #제품명 #MyBespokeStory #Samsung)'
 ];
 
-const COMMON_MANUAL = [
+const DEFAULT_COMMON_MANUAL = [
   '경쟁사가 아니더라도 다른 브랜드 로고가 노골적으로 드러나는 경우',
   'Disclaimer 크기가 화면의 1/5 이상 차지',
   '명령·버튼 조작 이후 실제 실행까지 딜레이가 느껴지는 경우',
@@ -327,6 +366,26 @@ const COMMON_MANUAL = [
   'footage가 다양하지 않은 경우',
   '스마트워치, 에어팟, 휴대폰 노출'
 ];
+
+// ── 검수 기준: localStorage에서 로드 (없으면 기본값) ──
+const CRITERIA_KEY = 'bespoke_review_criteria_v1';
+
+function loadCriteria() {
+  try {
+    const raw = localStorage.getItem(CRITERIA_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function getActiveCriteria() {
+  const saved = loadCriteria();
+  return {
+    PRODUCTS:      saved?.PRODUCTS      || DEFAULT_PRODUCTS,
+    COMMON_FAIL:   saved?.COMMON_FAIL   || DEFAULT_COMMON_FAIL,
+    COMMON_MANUAL: saved?.COMMON_MANUAL || DEFAULT_COMMON_MANUAL,
+  };
+}
 
 let extractedFrames = [];
 
@@ -356,17 +415,17 @@ function onVideoSelect(e) {
 
 // ── 장면 변화 감지 기반 프레임 추출 ──
 const FRAME_CONFIG = {
-  TARGET_WIDTH: 768,        // Vision 판독용 (UI 텍스트 인식 가능 해상도)
-  JPEG_QUALITY: 0.6,
+  TARGET_WIDTH: 1024,       // 텍스트 판독 가능 해상도 (UI 문자 인식 기준)
+  JPEG_QUALITY: 0.7,        // 텍스트 선명도 확보
   ANALYSIS_WIDTH: 160,      // 히스토그램 분석 전용 (저해상도 = 고속)
   SAMPLE_INTERVAL: 0.5,
   MAX_SAMPLES: 120,
-  SCENE_THRESHOLD: 25,
+  SCENE_THRESHOLD: 20,      // 장면 전환 감지 민감도 상향
   MIN_FRAMES: 6,
-  MAX_FRAMES: 10,           // Vercel 4.5MB 바디 한도 + 60s 타임아웃 대응
+  MAX_FRAMES: 20,           // Vercel Pro 300s 타임아웃 대응
   SEEK_TIMEOUT: 5000,
   LOAD_TIMEOUT: 15000,
-  MAX_PAYLOAD_BYTES: 3.4 * 1024 * 1024   // 4.5MB 한도 대비 안전 마진
+  MAX_PAYLOAD_BYTES: 3.4 * 1024 * 1024
 };
 
 function setFrameStatus(text, pct) {
@@ -555,6 +614,7 @@ async function runReview() {
   if (!country || !product) return alert('국가와 제품을 선택해주세요.');
   if (!url && !desc && !trans && !hasVideo) return alert('URL, 영상, Description, Transcript 중 하나 이상을 입력해주세요.');
 
+  const { PRODUCTS, COMMON_FAIL, COMMON_MANUAL } = getActiveCriteria();
   const pd = PRODUCTS[product] || { pn: product, features: [] };
 
   const prompt = `당신은 삼성 인플루언서 마케팅 컨텐츠 검수 전문가입니다.
@@ -838,6 +898,186 @@ function clearResult() {
 
 
 // ── 검수 이력 관리 (LocalStorage + JSON export/import) ──
+
+// ── 검수 기준 편집기 ──────────────────────────────────────
+
+let editorActiveTab = 'products';
+let editorActiveProduct = null;
+let editState = null;
+
+function openEditor() {
+  const { PRODUCTS, COMMON_FAIL, COMMON_MANUAL } = getActiveCriteria();
+  editState = JSON.parse(JSON.stringify({ PRODUCTS, COMMON_FAIL, COMMON_MANUAL }));
+  renderEditorProducts();
+  renderEditorCriteria('fail');
+  renderEditorCriteria('manual');
+  document.getElementById('editor-overlay').classList.add('show');
+}
+
+function closeEditor() {
+  document.getElementById('editor-overlay').classList.remove('show');
+  editState = null;
+}
+
+function switchEditorTab(tab) {
+  editorActiveTab = tab;
+  document.querySelectorAll('.editor-tab').forEach((b, i) =>
+    b.classList.toggle('active', ['products','fail','manual'][i] === tab));
+  document.querySelectorAll('.epanel').forEach((p, i) =>
+    p.classList.toggle('active', ['epanel-products','epanel-fail','epanel-manual'][i] === 'epanel-' + tab));
+}
+
+function renderEditorProducts() {
+  const products = Object.keys(editState.PRODUCTS);
+  if (!editorActiveProduct || !editState.PRODUCTS[editorActiveProduct]) {
+    editorActiveProduct = products[0];
+  }
+  document.getElementById('eproduct-tabs').innerHTML = products.map(p =>
+    `<button class="eproduct-tab ${p === editorActiveProduct ? 'active' : ''}"
+      onclick="selectEditorProduct(${JSON.stringify(p)})">${p}</button>`
+  ).join('');
+  document.getElementById('eproduct-panels').innerHTML = products.map(p => `
+    <div class="eproduct-panel ${p === editorActiveProduct ? 'active' : ''}" id="eprod-${btoa(encodeURIComponent(p)).replace(/=/g,'')}">
+      ${renderProductPanel(p)}
+    </div>`
+  ).join('');
+}
+
+function selectEditorProduct(p) {
+  syncProductFromDOM(editorActiveProduct);
+  editorActiveProduct = p;
+  renderEditorProducts();
+}
+
+function renderProductPanel(p) {
+  const prod = editState.PRODUCTS[p];
+  const feats = prod.features || [];
+  const pid = btoa(encodeURIComponent(p)).replace(/=/g,'');
+  return `
+    <div style="margin-bottom:10px">
+      <span class="e-label">공식 제품명 (pn)</span>
+      <input class="e-input" id="pn-${pid}" value="${esc(prod.pn)}" style="min-height:unset">
+    </div>
+    <div style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:6px">피처 목록</div>
+    <div id="feats-${pid}">
+      ${feats.map((f, i) => renderFeatureCard(pid, i, f)).join('')}
+    </div>
+    <button class="add-btn" onclick="addFeature(${JSON.stringify(p)})">+ 피처 추가</button>`;
+}
+
+const CHECK_TYPES = ['text','visual','visual_and_text'];
+function renderFeatureCard(pid, i, f) {
+  return `<div class="feature-card" id="feat-${pid}-${i}">
+    <div class="feature-card-head">
+      <input class="e-input feature-name" id="fn-${pid}-${i}" value="${esc(f.n)}" placeholder="피처명" style="min-height:unset">
+      <select class="feature-type-sel" id="ft-${pid}-${i}">
+        ${CHECK_TYPES.map(t => `<option value="${t}" ${f.check_type===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <button class="feature-del" onclick="removeFeature('${pid}',${i})">삭제</button>
+    </div>
+    <textarea class="e-input" id="fn-notes-${pid}-${i}" rows="2" placeholder="검수 포인트">${esc(f.notes||'')}</textarea>
+  </div>`;
+}
+
+function addFeature(p) {
+  syncProductFromDOM(p);
+  editState.PRODUCTS[p].features.push({ n: '', check_type: 'text', notes: '' });
+  renderEditorProducts();
+}
+
+function removeFeature(pid, idx) {
+  const p = decodeURIComponent(atob(pid.replace(/-/g,'+').replace(/_/g,'/')));
+  syncProductFromDOM(p);
+  editState.PRODUCTS[p].features.splice(idx, 1);
+  renderEditorProducts();
+}
+
+function syncProductFromDOM(p) {
+  if (!p || !editState || !editState.PRODUCTS[p]) return;
+  const pid = btoa(encodeURIComponent(p)).replace(/=/g,'');
+  const pnEl = document.getElementById('pn-' + pid);
+  if (pnEl) editState.PRODUCTS[p].pn = pnEl.value.trim();
+  (editState.PRODUCTS[p].features || []).forEach((f, i) => {
+    const nEl  = document.getElementById('fn-' + pid + '-' + i);
+    const tEl  = document.getElementById('ft-' + pid + '-' + i);
+    const noEl = document.getElementById('fn-notes-' + pid + '-' + i);
+    if (nEl)  f.n          = nEl.value.trim();
+    if (tEl)  f.check_type = tEl.value;
+    if (noEl) f.notes      = noEl.value.trim();
+  });
+}
+
+function renderEditorCriteria(type) {
+  const items = type === 'fail' ? editState.COMMON_FAIL : editState.COMMON_MANUAL;
+  document.getElementById(type + '-list').innerHTML = items.map((item, i) => `
+    <div class="criteria-item" id="${type}-item-${i}">
+      <textarea class="e-input" id="${type}-text-${i}" rows="2">${esc(item)}</textarea>
+      <button class="del-btn" onclick="removeCriteriaItem('${type}', ${i})">✕</button>
+    </div>`).join('');
+}
+
+function addCriteriaItem(type) {
+  syncCriteriaFromDOM(type);
+  if (type === 'fail') editState.COMMON_FAIL.push('');
+  else editState.COMMON_MANUAL.push('');
+  renderEditorCriteria(type);
+  document.getElementById(type + '-list').lastElementChild?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function removeCriteriaItem(type, idx) {
+  syncCriteriaFromDOM(type);
+  if (type === 'fail') editState.COMMON_FAIL.splice(idx, 1);
+  else editState.COMMON_MANUAL.splice(idx, 1);
+  renderEditorCriteria(type);
+}
+
+function syncCriteriaFromDOM(type) {
+  const arr = type === 'fail' ? editState.COMMON_FAIL : editState.COMMON_MANUAL;
+  arr.forEach((_, i) => {
+    const el = document.getElementById(`${type}-text-${i}`);
+    if (el) arr[i] = el.value.trim();
+  });
+}
+
+function saveCriteria() {
+  syncProductFromDOM(editorActiveProduct);
+  syncCriteriaFromDOM('fail');
+  syncCriteriaFromDOM('manual');
+  editState.COMMON_FAIL   = editState.COMMON_FAIL.filter(s => s.trim());
+  editState.COMMON_MANUAL = editState.COMMON_MANUAL.filter(s => s.trim());
+  Object.values(editState.PRODUCTS).forEach(p => {
+    p.features = p.features.filter(f => f.n.trim());
+  });
+  try {
+    localStorage.setItem(CRITERIA_KEY, JSON.stringify(editState));
+  } catch (e) {
+    alert('저장 실패: 브라우저 저장 공간이 부족합니다.');
+    return;
+  }
+  const flash = document.getElementById('save-flash');
+  flash.textContent = '✓ 검수 기준이 저장되었습니다';
+  flash.classList.add('show');
+  setTimeout(() => flash.classList.remove('show'), 2000);
+  closeEditor();
+}
+
+function resetCriteria() {
+  if (!confirm('모든 검수 기준을 기본값으로 되돌릴까요?\n저장된 변경사항이 사라집니다.')) return;
+  localStorage.removeItem(CRITERIA_KEY);
+  editState = JSON.parse(JSON.stringify({
+    PRODUCTS: DEFAULT_PRODUCTS,
+    COMMON_FAIL: DEFAULT_COMMON_FAIL,
+    COMMON_MANUAL: DEFAULT_COMMON_MANUAL,
+  }));
+  renderEditorProducts();
+  renderEditorCriteria('fail');
+  renderEditorCriteria('manual');
+  const flash = document.getElementById('save-flash');
+  flash.textContent = '✓ 기본값으로 초기화되었습니다';
+  flash.classList.add('show');
+  setTimeout(() => { flash.classList.remove('show'); flash.textContent = '✓ 검수 기준이 저장되었습니다'; }, 2000);
+}
+
 const HISTORY_KEY = 'influencer_review_history_v1';
 const HISTORY_MAX = 30;          // 브라우저 저장 한도(약 5MB) 여유 확보
 const INPUT_STORE_LIMIT = 4000;  // 이력에 저장할 입력값 최대 길이
@@ -1033,10 +1273,11 @@ function generateFeedbackEn() {
     fix:      ''
   };
 
+  // 정렬: 시점 있는 항목(시간순) → 시점 없는 fix → confirm → previous
   const items = arr.map(i => ({
     time: i.type === 'confirm'  ? Math.min(parseTime(i.timestamp), 999997)
         : i.type === 'previous' ? 999998
-        : parseTime(i.timestamp),
+        : Math.min(parseTime(i.timestamp), 999996),
     timeLabel: i.timestamp || null,
     text: (PREFIX[i.type] || '') + (i.note || '')
   })).filter(i => i.text.trim());
@@ -1052,7 +1293,7 @@ function generateFeedbackKo() {
 
   (lastResult.fail_items||[]).filter(i => i.status === 'fail').forEach(i => {
     items.push({
-      time: parseTime(i.timestamp),
+      time: Math.min(parseTime(i.timestamp), 999996),
       timeLabel: i.timestamp || null,
       text: `${i.label}: ${i.detail || ''}${i.found ? ` (발견: ${i.found})` : ''}`
     });
@@ -1060,7 +1301,7 @@ function generateFeedbackKo() {
 
   (lastResult.visual_items||[]).filter(i => i.status === 'fail').forEach(i => {
     items.push({
-      time: parseTime(i.timestamp),
+      time: Math.min(parseTime(i.timestamp), 999996),
       timeLabel: i.timestamp || null,
       text: `${i.label}: ${i.detail || ''}${i.found ? ` (발견: ${i.found})` : ''}`
     });
@@ -1076,8 +1317,8 @@ function generateFeedbackKo() {
 
   (lastResult.visual_checklist||[]).forEach(i => {
     items.push({
-      time: parseTime(i.timestamp),
-      timeLabel: i.timestamp || null,
+      time: Math.min(parseTime(i.timestamp), 999997),
+      timeLabel: (i.timestamp && parseTime(i.timestamp) < 999996) ? i.timestamp : null,
       text: `[확인필요] ${i.label}: ${i.instruction || ''}`
     });
   });
@@ -1133,9 +1374,52 @@ async function copyFeedback() {
 </script>
 
 
+<button class="editor-toggle" onclick="openEditor()">⚙️ 검수 기준 편집</button>
 <button class="history-toggle" onclick="toggleHistoryPanel()">
   📚 검수 이력 <span class="history-count" id="history-count">0</span>
 </button>
+
+
+<!-- ── 검수 기준 편집기 모달 ── -->
+<div class="editor-overlay" id="editor-overlay" onclick="if(event.target===this)closeEditor()">
+  <div class="editor-modal">
+    <div class="editor-header">
+      <h3>⚙️ 검수 기준 편집</h3>
+      <span class="reset-link" onclick="resetCriteria()">기본값으로 초기화</span>
+      <button class="close-btn" onclick="closeEditor()">✕</button>
+    </div>
+    <div class="editor-tabs">
+      <button class="editor-tab active" onclick="switchEditorTab('products')">제품별 피처</button>
+      <button class="editor-tab" onclick="switchEditorTab('fail')">Auto Fail 기준</button>
+      <button class="editor-tab" onclick="switchEditorTab('manual')">Manual 검수 기준</button>
+    </div>
+    <div class="editor-body">
+      <!-- 제품별 피처 탭 -->
+      <div class="epanel active" id="epanel-products">
+        <div class="eproduct-tabs" id="eproduct-tabs"></div>
+        <div id="eproduct-panels"></div>
+      </div>
+      <!-- Auto Fail 탭 -->
+      <div class="epanel" id="epanel-fail">
+        <div class="hint" style="margin-bottom:12px">미충족 시 ✕ Auto Fail로 처리되는 공통 기준입니다.</div>
+        <div id="fail-list"></div>
+        <button class="add-btn" onclick="addCriteriaItem('fail')">+ 항목 추가</button>
+      </div>
+      <!-- Manual 탭 -->
+      <div class="epanel" id="epanel-manual">
+        <div class="hint" style="margin-bottom:12px">미충족 시 △ Manual 검수로 분류되는 공통 기준입니다.</div>
+        <div id="manual-list"></div>
+        <button class="add-btn" onclick="addCriteriaItem('manual')">+ 항목 추가</button>
+      </div>
+    </div>
+    <div class="editor-footer">
+      <span class="hint">변경사항은 브라우저에 저장되며 다음 검수부터 바로 반영됩니다</span>
+      <button class="action-btn" onclick="closeEditor()">취소</button>
+      <button class="action-btn primary" onclick="saveCriteria()">저장</button>
+    </div>
+  </div>
+</div>
+<div class="save-flash" id="save-flash">✓ 검수 기준이 저장되었습니다</div>
 
 <div class="history-panel" id="history-panel">
   <div class="history-header">
@@ -1174,3 +1458,4 @@ async function copyFeedback() {
 
 </body>
 </html>
+
